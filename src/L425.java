@@ -4,7 +4,7 @@ import service.Menu;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class L423 {
+public class L425 {
     void main() {
         Connection connection=null;
         DatabaseMain db=new DatabaseMain();
