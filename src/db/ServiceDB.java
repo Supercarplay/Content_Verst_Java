@@ -3,47 +3,52 @@ package db;
 import service.Content.*;
 import service.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ServiceDB {
     /// Добавление контент элемента в базу данных
     public void add(ContentElement element, DatabaseMain db){
-        String sqlConnection = "INSERT INTO TablePost (Users_ID, Date_post, name_post, About_post, Text_post, Scencens_post," +
+        String sqlAdd = "INSERT INTO TablePost (Users_ID, Date_post, name_post, About_post, Text_post, Scencens_post," +
                                 "ViewMedia_post, Published, Files, Approved)" +
                                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try(Connection connection = db.getConnecting()){
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlConnection);
+            PreparedStatement preparedStatementAdd = connection.prepareStatement(sqlAdd, Statement.RETURN_GENERATED_KEYS);
 
             // Установка значений параметров
-            preparedStatement.setInt(1, Integer.parseInt(db.getUsersId()));
-            preparedStatement.setString(2, element.getDate()+" "+element.getTime());
-            preparedStatement.setString(3, element.getName());
-            preparedStatement.setString(4, element.getAbout());
-            preparedStatement.setString(5, element.getText());
+            preparedStatementAdd.setInt(1, Integer.parseInt(db.getUsersId()));
+            preparedStatementAdd.setString(2, element.getDate()+" "+element.getTime());
+            preparedStatementAdd.setString(3, element.getName());
+            preparedStatementAdd.setString(4, element.getAbout());
+            preparedStatementAdd.setString(5, element.getText());
             if(element instanceof MediaPost){
-                preparedStatement.setString(6, ((MediaPost) element).getScript());
-                preparedStatement.setString(7,((MediaPost) element).getViewMedia());
-                preparedStatement.setString(9, ((MediaPost) element).getURL());
+                preparedStatementAdd.setString(6, ((MediaPost) element).getScript());
+                preparedStatementAdd.setString(7,((MediaPost) element).getViewMedia());
+                preparedStatementAdd.setString(9, ((MediaPost) element).getURL());
             }else {
-                preparedStatement.setString(6, null);
-                preparedStatement.setString(7, null);
-                preparedStatement.setString(9, null);
+                preparedStatementAdd.setString(6, null);
+                preparedStatementAdd.setString(7, null);
+                preparedStatementAdd.setString(9, null);
             }
-            preparedStatement.setBoolean(8, element.isPublished());
-            preparedStatement.setBoolean(10, element.isApproved());
+            preparedStatementAdd.setBoolean(8, element.isPublished());
+            preparedStatementAdd.setBoolean(10, element.isApproved());
 
-            int status=preparedStatement.executeUpdate();
+            int status=preparedStatementAdd.executeUpdate();
             if(status>0){
                 IO.println("Пост добавлен в базу данных!");
+                try (ResultSet generatedKeys = preparedStatementAdd.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        // getInt(1) берет первую колонку из результата, которой является наш ID
+                        element.setIdDB(generatedKeys.getInt(1));
+                        IO.println("Присвоен ID в БД: " + element.getIdDB());
+                    }
+                }
             }
+
         } catch (SQLException e) {
             IO.println("Ошибка при сохранении в БД: " + e.getMessage());
         }
     }
-    /// обновление элемента базы данных на актуальные данные
+    /// Обновление элемента базы данных на актуальные данные
     public void update(ContentElement element){
         DatabaseMain db = new DatabaseMain();
         String sqlConnection = "UPDATE TablePost SET Users_ID = ?, Date_post = ?, name_post = ?, About_post = ?, Text_post = ?, " +
@@ -84,17 +89,18 @@ public class ServiceDB {
     /// Удаление элемента из базы данных по ID из БД, содержащийся в ContentElement каждого поста
     public void delete(ContentElement element){
         DatabaseMain db = new DatabaseMain();
-        String sqlConnection ="DELETE FROM TablePost WHERE ID=?";
+        String sqlConnection ="DELETE FROM TablePost WHERE ID=? and Users_ID=?";
         try(Connection connection = db.getConnecting()){
             PreparedStatement preparedStatement=connection.prepareStatement(sqlConnection);
 
             preparedStatement.setInt(1, element.getIdDB());
+            preparedStatement.setInt(2, Integer.parseInt(db.getUsersId()));
 
             int status=preparedStatement.executeUpdate();
             if(status>0){
                 IO.println("Пост удалён из базы данных!");
             }else {
-                IO.println("Запись не найдена в БД!");
+                IO.println("Запись не найдена в БД или у вас нет прав на её удаление!");
             }
         } catch (SQLException e) {
             IO.println("Ошибка при удалении из БД: " + e.getMessage());
