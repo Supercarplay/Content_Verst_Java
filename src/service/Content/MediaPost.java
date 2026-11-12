@@ -86,15 +86,11 @@ public class MediaPost extends ContentMediaElement{
                     break;
                 }
                 case '8':{
-                    if(isApproved()){
-                        setApproved(false);
-                    }else{setApproved(true);}
+                    setApproved(!isApproved());
                     break;
                 }
                 case '9':{
-                    if(isPublished()){
-                        setPublished(false);
-                    }else{setPublished(true);}
+                    setPublished(!isPublished());
                     break;
                 }
                 default:{
@@ -111,7 +107,10 @@ public class MediaPost extends ContentMediaElement{
         IO.println("Введите URL файлов (через пробел):");
         String urls = scanner.nextLine();
         setURL(urls);
-
+        IO.println("Вид медиа ещё раз (фото/видео)");
+        setViewMedia(scanner.nextLine());
+        IO.println("Введите сценарий съёмки");
+        setScript(scanner.nextLine());
         IO.println("Элемент контента создан!");
     }
 
