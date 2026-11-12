@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 public abstract class ContentElement {
@@ -51,17 +52,22 @@ public abstract class ContentElement {
 
     // Геттеры и сеттеры для date
     public void setDate(String dateStr) {
-        if (dateStr == null || dateStr.trim().isEmpty()) {
-            System.out.println("Ошибка: дата не может быть пустой. Устанавливаем сегодняшнюю дату");
-            this.date=LocalDate.now();
-            return;
-        }
-
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            this.date = LocalDate.parse(dateStr, formatter);
-        } catch (DateTimeParseException e) {
-            System.out.println("Ошибка формата даты. Используйте формат DD.MM.YYYY (например, 03.11.2026)");
+        boolean isValid=false;
+        while (!isValid) {
+            if (dateStr == null || dateStr.trim().isEmpty()) {
+                System.out.println("Ошибка: дата не может быть пустой. Устанавливаем сегодняшнюю дату");
+                this.date = LocalDate.now();
+                return;
+            }
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                this.date = LocalDate.parse(dateStr, formatter);
+                isValid=true;
+            } catch (DateTimeParseException e) {
+                System.out.println("Ошибка формата даты. Используйте формат DD.MM.YYYY (например, 03.11.2026)");
+                IO.println("Попробуйте ввести дату еще раз:");
+                dateStr = IO.readln().trim();
+            }
         }
     }
     public String getDate() {
@@ -71,17 +77,22 @@ public abstract class ContentElement {
 
     // Геттеры и сеттеры для time
     public void setTime(String timeStr) {
-        if (timeStr==null||timeStr.trim().isEmpty()){
-            System.out.println("Ошибка: время не может быть пустым. Устанавливаем нынешнее время");
-            this.time=LocalTime.now();
-            return;
-        }
+        boolean isValid=false;
+        while (!isValid) {
+            if (timeStr == null || timeStr.trim().isEmpty()) {
+                System.out.println("Ошибка: время не может быть пустым. Устанавливаем нынешнее время");
+                this.time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+                return;
+            }
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            this.time = LocalTime.parse(timeStr, formatter);
-        } catch (Exception e) {
-            System.out.println("Ошибка формата времени. Используйте HH:mm");
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                this.time = LocalTime.parse(timeStr, formatter);
+                isValid=true;
+            } catch (Exception e) {
+                System.out.println("Ошибка формата времени. Используйте HH:mm");
+                timeStr=IO.readln().trim();
+            }
         }
     }
     public String getTime() {

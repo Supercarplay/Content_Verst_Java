@@ -25,7 +25,11 @@ public class Menu {
                     "4. Посмотреть несогласованные посты\n"+
                     "0. ВЫЙТИ");
 
-            choice=IO.readln().trim().charAt(0);
+            try {
+                choice=IO.readln().trim().charAt(0);
+            }catch (StringIndexOutOfBoundsException e){
+                choice= (char) -1;
+            }
             switch (choice){
                 case '0':{status=false; break;}
                 case '1':{contentPlan.getAllList();editContentPlan(contentPlan, db);break;}
@@ -50,8 +54,12 @@ public class Menu {
                     //"4. Согласовать пост\n" +
                     //"5. Перенести пост в архив\n"+
                     "0. ВЫЙТИ");
+            try {
+                choice=IO.readln().trim().charAt(0);
+            }catch (StringIndexOutOfBoundsException e){
+                choice= (char) -1;
+            }
 
-            choice=IO.readln().trim().charAt(0);
             switch (choice){
                 case '0':{status=false; break;}
                 case '1':{

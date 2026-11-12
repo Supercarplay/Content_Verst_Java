@@ -92,25 +92,34 @@ public class ContentManager {
         sortList();
     }
     /// Удаление элемента из памяти устройства
-    public void remove(String id, ServiceDB postManagerDB) {
+    public void remove(String id, ServiceDB postManagerDB){
         try{
-            contentElementsList.remove(Integer.parseInt(id));
+            if (Integer.parseInt(id) < 0 || Integer.parseInt(id) >= contentElementsList.size()) {
+                throw new ContentManagerException();
+            }
             ContentElement element = contentElementsList.get(Integer.parseInt(id));
             postManagerDB.delete(element);
+            contentElementsList.remove(Integer.parseInt(id));
             sortList();
-        }catch (Exception _){
-            new ContentManagerException();
-            return;
+        } catch (NumberFormatException e) {
+            IO.println("Ошибка: ID должен быть числом!");
+        }catch(ContentManagerException e){
+            IO.println(e.getMessage());
         }
 
     }
-    /// Редактирование элемента в памяти устройста
+    /// Редактирование элемента в памяти устройства
     public void edit(String id, ServiceDB postManagerDB){
         int index=-1;
         try {
             index=Integer.parseInt(id);
-        }catch (Exception _){
-            new ContentManagerException();
+            if (Integer.parseInt(id) < 0 || Integer.parseInt(id) >= contentElementsList.size()) {
+                throw new ContentManagerException();
+            }
+        } catch (NumberFormatException e) {
+            IO.println("Ошибка: ID должен быть числом!");
+        }catch (ContentManagerException e){
+            IO.println(e.getMessage());
             return;
         }
         if (index < 0 || index >= contentElementsList.size()) {

@@ -37,9 +37,7 @@ public class ServiceDB {
                 IO.println("Пост добавлен в базу данных!");
                 try (ResultSet generatedKeys = preparedStatementAdd.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        // getInt(1) берет первую колонку из результата, которой является наш ID
                         element.setIdDB(generatedKeys.getInt(1));
-                        IO.println("Присвоен ID в БД: " + element.getIdDB());
                     }
                 }
             }
