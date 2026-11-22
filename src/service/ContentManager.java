@@ -1,12 +1,12 @@
 package service;
 
-import db.DatabaseMain;
 import db.ServiceDB;
 import service.Content.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class ContentManager {
     private ArrayList<ContentElement> contentElementsList=new ArrayList<>();
@@ -21,6 +21,9 @@ public class ContentManager {
         });
     }
 
+    public List<ContentElement> getAll() {
+        return new ArrayList<>(contentElementsList);
+    }
     /// Вывод на экран всего списка постов, хранящийся в БД
     public void getAllList(){
         if(contentElementsList.isEmpty()){
