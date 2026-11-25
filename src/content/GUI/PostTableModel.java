@@ -1,9 +1,11 @@
 package content.GUI;
 
+import db.ServiceDB;
 import service.Content.ContentElement;
 import service.Content.MediaPost;
 import service.ContentManager;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
@@ -12,17 +14,20 @@ public class PostTableModel extends AbstractTableModel {
     private List<ContentElement> rows;
 
     private final String[] columns = {
-            "ID БД", "Дата и время", "Название",
-            "Тип", "Согласован", "Опубликован"
+            "Дата и время", "Название", "Описание", "Текст", "Сценарий","Вид медиа", "", ""
     };
 
-    public PostTableModel(ContentManager manager) {
+    public PostTableModel(ContentManager manager, int status) {
         this.manager = manager;
-        refresh();
+        refresh(status);
     }
 
-    public void refresh() {
-        rows = manager.getAll();
+    public void refresh(int status) {
+        if(status==0){
+            rows=manager.getNoPublished();
+        }else if(status==1){
+            rows=manager.getPublished();
+        }
         fireTableDataChanged();
     }
 
@@ -46,13 +51,24 @@ public class PostTableModel extends AbstractTableModel {
         ContentElement post = rows.get(row);
 
         switch (column) {
-            case 0: return post.getIdDB();
-            case 1: return post.getDate() + " " + post.getTime();
-            case 2: return post.getName();
-            case 3: return post instanceof MediaPost ? "Медиа" : "Текст";
-            case 4: return post.isApproved() ? "Да" : "Нет";
-            case 5: return post.isPublished() ? "Да" : "Нет";
-            default: return "";
+            case 0: return post.getDate() + " " + post.getTime();
+            case 1: return post.getName();
+            case 2: return post.getAbout();
+            case 3: return post.getText();
+            case 4: {
+                if (post instanceof MediaPost) {
+                    return ((MediaPost) post).getScript();
+                }
+                return "";
+            }
+            case 5: return post instanceof MediaPost ? "Медиа" : "Текст";
+            case 6: return null;
+            case 7: return null;
+            default: return null;
         }
+    }
+
+    public ContentElement getRowAt(Integer row) {
+        return rows.get(row);
     }
 }

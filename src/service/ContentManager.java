@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ContentManager {
     private ArrayList<ContentElement> contentElementsList=new ArrayList<>();
+
     public ContentManager(){};
     /// Сортировка списка постов по дате и времени
     private void sortList(){
@@ -37,6 +38,24 @@ public class ContentManager {
             IO.println(content.render());
             id++;
         }
+    }
+    public List<ContentElement> getNoPublished(){
+        ArrayList<ContentElement> contentElementsNoPublished=new ArrayList<>();
+        for(ContentElement content : contentElementsList){
+            if(!content.isPublished()){
+                contentElementsNoPublished.add(content);
+            }
+        }
+        return contentElementsNoPublished;
+    }
+    public List<ContentElement> getPublished(){
+        ArrayList<ContentElement> contentElementsPublished=new ArrayList<>();
+        for(ContentElement content : contentElementsList){
+            if(content.isPublished()){
+                contentElementsPublished.add(content);
+            }
+        }
+        return contentElementsPublished;
     }
     /// Вывод на экран списка постов, которые были опубликование
     public void getPublishedList(){
@@ -109,7 +128,6 @@ public class ContentManager {
         }catch(ContentManagerException e){
             IO.println(e.getMessage());
         }
-
     }
     /// Редактирование элемента в памяти устройства
     public void edit(String id, ServiceDB postManagerDB){
@@ -135,5 +153,9 @@ public class ContentManager {
         element.edit();
         postManagerDB.update(element);
         sortList();
+    }
+
+    public void clear() {
+        contentElementsList.clear();
     }
 }

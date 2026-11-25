@@ -13,9 +13,9 @@ public class L525 {
         DatabaseMain db = new DatabaseMain();
         ContentManager manager = new ContentManager();
 
-        //new ServiceDB().loadAll(manager, db);
+        new ServiceDB().loadAll(manager, db);
 
-        new WindowMain(manager).setVisible(true);
+        new WindowMain(manager, db).setVisible(true);
 
 //        Connection connection=null;
 //        try {
